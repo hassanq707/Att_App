@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // CORS Configuration
 const allowedOrigins = [
-  'https://attendance-app-fe-sepia.vercel.app',
+  'https://attapp-eight.vercel.app',
   'http://localhost:5173'
 ];
 
