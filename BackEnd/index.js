@@ -65,7 +65,7 @@ app.post('/logout', (req, res) => {
 app.use("/", dataRoute);
 app.use("/user", userRoute);
 
-
+// DB Connection
 connectDB(process.env.DB_URL).then(() => {
   app.listen(PORT, () => {
     console.log("Server is listening on PORT: " + PORT);
