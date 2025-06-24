@@ -8,7 +8,7 @@ import { set_token } from '../store/slices/TokenSlice';
 
 const EmpDash = () => {
 
-  const { emp_data} = useSelector((state) => state.data);
+  const { emp_data } = useSelector((state) => state.data);
 
 
   const { token } = useSelector(data => data.auth)
@@ -43,14 +43,14 @@ const EmpDash = () => {
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
-
-    if (!storedToken) {
-      return navigate("/login");
-    }
-
+    if (!storedToken) return navigate("/login");
     dispatch(set_token(storedToken));
-    fetchUserData();
   }, []);
+
+  useEffect(() => {
+    if (token) fetchUserData();
+  }, [token]);
+
 
 
   if (!isAuthorized) return <div className="text-white text-center mt-10">Loading...</div>;
@@ -58,7 +58,7 @@ const EmpDash = () => {
 
   return (
     <>
-      <div className="box-border min-h-screen w-screen bg-[#031114]">
+      <div className="box-border min-h-screen w-full bg-gray-900">
         <Header name={emp_data.fullname} />
         <Outlet />
       </div>

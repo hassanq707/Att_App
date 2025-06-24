@@ -1,40 +1,17 @@
-import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
-import Pending_Cards from './Pending_Cards'
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import Pending_Cards from './Pending_Cards';
 
 const Req_Attendance = () => {
-
-  const { all_emp_data } = useSelector(result => result.data)
-
-  const [btn, setBtn] = useState("attendance")
-
-  const [data, setData] = useState([])
-
-  const handleBtnClick = (btn) => {
-    setBtn(btn)
-  }
-
-  // Agar aap flatMap ke andar map aur filter use kar rahe ho, 
-  // to flatMap ka emp object uske andar likhe sab functions ko accessible hota hai.
-  // Matlab jab flatMap run hoga, har ek emp ka reference filter aur 
-  // map dono ke andar pass hoga kyunki yeh flatMap ke andar likhe gaye hain.
-
-  // const all_emp_data2 = [
-  //   { user: "A", attendance: [{ date: "2024-02-01" }, { date: "2024-02-02" }] },
-  //   { user: "B", attendance: [{ date: "2024-02-03" }] }
-  // ];
-
-  // const result = all_emp_data2.map(emp => emp["attendance"]);
-  // console.log(result);
-
-  // flatMap is liye use kiya ke index me attendance ka array 
-  // araha tha jiski wajha se array of array ban raha tha
+  const { all_emp_data } = useSelector(result => result.data);
+  const [btn, setBtn] = useState("attendance");
+  const [data, setData] = useState([]);
 
   useEffect(() => {
     if (all_emp_data?.length > 0) {
       const filteredData = all_emp_data.flatMap(emp =>
         (emp[btn])
-          .filter(record => record.status === "pending") 
+          .filter(record => record.status === "pending")
           .map(record => ({
             ...record,
             user: emp.user
@@ -45,29 +22,45 @@ const Req_Attendance = () => {
   }, [btn, all_emp_data]);
 
   return (
-    <div className='w-full '>
-      <div className='flex items-center text-white px-4'>
-        <h1 className='text-[#1c8d9e] text-2xl font-bold'>Pending</h1>
-        <button onClick={() => handleBtnClick("attendance")} className={`${btn == "attendance" ? "bg-[#124e57]" : "bg-[#167a8a]"} py-3 px-5 rounded md m-4`}>
+    <div className="bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 border border-gray-700 mx-2 sm:mx-0">
+      <h2 className="text-xl sm:text-2xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+        Pending Approvals
+      </h2>
+
+      <div className="flex gap-2 sm:gap-3 mb-4">
+        <button 
+          className={`px-3 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${
+            btn === "attendance" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+          }`}
+          onClick={() => setBtn("attendance")}
+        >
           Attendance
         </button>
-        <button onClick={() => handleBtnClick("leaves")} className={`${btn == "leaves" ? "bg-[#124e57]" : "bg-[#167a8a]"} py-3 px-5 rounded md m-4`}>
+        <button 
+          className={`px-3 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${
+            btn === "leaves" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+          }`}
+          onClick={() => setBtn("leaves")}
+        >
           Leaves
         </button>
       </div>
-      {!data.length > 0 ? <p className='text-center text-white capitalize'>No Pending {btn}</p>
-        :
-        <div className="w-full">
-          <div className="max-h-[355px] overflow-y-auto flex flex-wrap">
-            {data.map((elem) => (
-              <Pending_Cards data={elem} key={elem._id} property={btn}/>
-            ))}
 
-          </div>
+      {data.length > 0 ? (
+        <div className="space-y-3 max-h-[500px] overflow-y-auto">
+          {data.map((elem) => (
+            <Pending_Cards key={elem._id} data={elem} property={btn} />
+          ))}
         </div>
-      }
+      ) : (
+        <div className="text-center py-8">
+          <p className="text-gray-400 text-sm sm:text-base">
+            No pending {btn} requests
+          </p>
+        </div>
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default Req_Attendance
+export default Req_Attendance;

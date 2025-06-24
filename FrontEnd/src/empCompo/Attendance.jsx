@@ -1,86 +1,115 @@
 import { useState, useEffect } from "react";
-import {useDispatch, useSelector } from "react-redux";
-import axios from 'axios'
+import { useDispatch, useSelector } from "react-redux";
+import axios from 'axios';
 import { update_att_info } from "../store/slices/UserSlice";
 
 const Attendance = () => {
-
   const { att_info } = useSelector((state) => state.data);
-
   const { emp_data: user } = useSelector((state) => state.data);
+  const { token } = useSelector(data => data.auth);
+  const [attendance, setAttendance] = useState(att_info['attendance'] || []);
+  const dispatch = useDispatch();
 
-  const {token} = useSelector(data => data.auth)
-  
-  const [attendance , setAttendace] = useState(att_info['attendance'])
-
-
-  const dispatch = useDispatch()
-  
-  useEffect(()=>{
-     if(!att_info.attendance) return;
-     setAttendace(att_info.attendance)
-  },[att_info])
-
+  useEffect(() => {
+    if (att_info.attendance) {
+      setAttendance(att_info.attendance);
+    }
+  }, [att_info]);
 
   const today = new Date().toISOString().split("T")[0];
-  
-    
-  const pendingAttendences = attendance.filter((result) => {
-      return result.status == "pending"
-  });
+  const pendingAttendances = attendance.filter(result => result.status === "pending");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    axios.post(`${import.meta.env.VITE_BACKEND_URL}/attendance`, { today, _id: user._id } , {headers : {token}})
-      .then((response) => {
-        if (response.data.message) return alert(response.data.message);
-        alert("Attendance has been submitted")
-        dispatch(update_att_info({ data : response.data , category : 'attendance'}))
-      })
-    .catch((err) => console.log(err))
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/attendance`, 
+        { today, _id: user._id },
+        { headers: { token } }
+      );
+      alert(response.data.message || "Attendance submitted successfully");
+      dispatch(update_att_info({ data: response.data, category: 'attendance' }));
+    } catch (err) {
+      console.error("Attendance error:", err);
+      alert(err.response?.data?.message || "Failed to submit attendance");
+    }
   };
 
   return (
-    <div className="w-full my-10 border-4 px-5 py-3 border-[#0f5661] pr-5 flex justify-between">
-      <div className="max-w-md w-1/2 mx-auto bg-transparent border-4 border-[#0f5661] p-6 rounded-lg shadow-md">
-        <h2 className="text-xl font-bold mb-4 text-[#1a95a8]">Mark Attendance</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-[#1a95a8] font-semibold">Date:</label>
-            <input type="text" value={today} disabled className="w-full p-2 mt-1 border-2 border-[#0f5661]  rounded text-gray-400 bg-transparent" />
-          </div>
-          <div>
-            <label className="block text-[#1a95a8] font-semibold">Full Name:</label>
-            <input type="text" value={user.fullname || ""} disabled className="w-full p-2 mt-1 border-2 border-[#0f5661] text-gray-400 rounded bg-transparent" />
-          </div>
-          <button type="submit" className="w-full p-2 text-white rounded bg-blue-500 hover:bg-blue-600">
-            Mark Attendance
-          </button>
-        </form>
-      </div>
-      <div className="w-1/2">
-        <h1 className="text-2xl text-[#1a95a8] font-bold mb-2">Pending Attendances</h1>
-        <div className="max-h-60 overflow-y-auto flex flex-wrap">
-        {!pendingAttendences.length > 0 ? <span className="text-white">NO DATA</span>:
-          pendingAttendences.map((att) => (
-            <div key={att._id} className="min-h-10 mb-2 px-2 border-2 my-3 flex items-center justify-between w-full">
-              <h1 className="text-white text-md">
-              {new Date(att.date).toISOString().split("T")[0]}
-              </h1>
+    <div className="container mx-auto px-4 py-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+
+        <div className="bg-gray-800 rounded-xl shadow-lg p-5 sm:p-6 border border-gray-700">
+          <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+            Mark Today's Attendance
+          </h2>
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+            <div className="grid grid-cols-1 gap-3 sm:gap-4">
               <div>
-                <label className="text-[#1a95a8] font-semibold mr-2">Status:</label>
-                <span className="px-3 py-1 rounded text-white bg-yellow-500">
-                  {att.status}
-                </span>
+                <label className="block text-sm sm:text-base font-medium text-gray-300 mb-1">Date</label>
+                <input
+                  type="text"
+                  value={today}
+                  disabled
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-300 text-sm sm:text-base"
+                />
+              </div>
+              <div>
+                <label className="block text-sm sm:text-base font-medium text-gray-300 mb-1">Employee Name</label>
+                <input
+                  type="text"
+                  value={user.fullname || ""}
+                  disabled
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-300 text-sm sm:text-base"
+                />
               </div>
             </div>
-          ))}
+            <button
+              type="submit"
+              className="w-full py-2 sm:py-3 px-4 bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-blue-600 hover:to-cyan-500 text-white font-medium rounded-lg transition-all duration-300 text-sm sm:text-base"
+            >
+              Submit Attendance
+            </button>
+          </form>
+        </div>
+
+        <div className="bg-gray-800 rounded-xl shadow-lg p-5 sm:p-6 border border-gray-700">
+          <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+            Pending Approvals
+          </h2>
+          {pendingAttendances.length > 0 ? (
+            <div className="space-y-3 sm:space-y-4 max-h-80 sm:max-h-96 overflow-y-auto pr-2">
+              {pendingAttendances.map((att) => (
+                <div key={att._id} className="bg-gray-700 p-3 sm:p-4 rounded-lg border-l-4 border-yellow-500">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="text-xs sm:text-sm text-gray-400">Date</p>
+                      <p className="font-medium text-white text-sm sm:text-base">
+                        {new Date(att.date).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        })}
+                      </p>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="px-2 sm:px-3 py-1 text-xs font-semibold rounded-full bg-yellow-500 text-white">
+                        Pending
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-6 sm:py-8">
+              <p className="text-gray-400 text-sm sm:text-base">No pending attendance records</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-export default Attendance;
-
-
+export default Attendance;  

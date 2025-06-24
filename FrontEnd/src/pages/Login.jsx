@@ -1,90 +1,114 @@
 import axios from 'axios';
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { set_att_info, set_emp_data } from '../store/slices/UserSlice';
 import { useDispatch } from 'react-redux';
 import { set_token } from '../store/slices/TokenSlice';
 
 const Login = () => {
-
   const [data, setData] = useState({
     email: '',
     password: '',
-  })
-
-  const [error, setError] = useState(null)
-
-  const navigate = useNavigate()
-
-  const dispatch = useDispatch()
+  });
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const onChangeHandle = (e) => {
-    if (error) setError(null)
+    if (error) setError(null);
     const { value, name } = e.target;
     setData({
       ...data,
       [name]: value
-    })
-  }
+    });
+  };
 
   const submitHandle = (e) => {
     e.preventDefault();
     axios.post(`${import.meta.env.VITE_BACKEND_URL}/user/login`, data)
       .then(response => {
         const { user, userData, token } = response.data;
-        dispatch(set_emp_data(user))
-        dispatch(set_att_info(userData))
-        dispatch(set_token(token))
-        localStorage.setItem("token", token)
-        if (user.role == "admin") return navigate("/admin")
-        navigate("/")
+        dispatch(set_emp_data(user));
+        dispatch(set_att_info(userData));
+        dispatch(set_token(token));
+        localStorage.setItem("token", token);
+        if (user.role === "admin") navigate("/admin");
+        else navigate("/");
       })
       .catch(error => {
-        console.log(error)
+        console.log(error);
         if (error.response) {
-          console.log("Login Failed:", error.response.data.message);
-          setError(error.response.data.message);
+          setError(error.response.data.message || "Invalid credentials");
         } else {
-          console.error("Network error:", error);
-          setError("Something went wrong. Please try again.");
+          setError("Network error. Please try again.");
         }
       });
-  }
+  };
 
   return (
-    <div className=' bg-[#031114] w-screen h-screen flex justify-center items-center'>
-      <div className='shrink-1 p-6  border-2 border-[#0f5661] rounded-lg'>
-        <form onSubmit={submitHandle}>
-          <h1 className='mt-3 mb-5 text-center text-3xl text-white'>Login</h1>
-          <div className='mb-5 flex flex-col'>
-            <label className='text-white text-lg mb-2'>Email: </label>
+    <div className='min-h-screen w-full bg-gray-900 flex items-center justify-center p-4'>
+      <div className='w-full max-w-md bg-gray-800 rounded-xl shadow-lg border border-gray-700 p-6 sm:p-8'>
+        <h1 className='text-2xl sm:text-3xl font-bold text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500'>
+          Welcome Back
+        </h1>
+        
+        {error && (
+          <div className='mb-4 p-3 bg-red-900/30 border border-red-700 rounded-lg text-red-300 text-sm'>
+            {error}
+          </div>
+        )}
+        
+        <form onSubmit={submitHandle} className='space-y-5'>
+          <div>
+            <label className='block text-sm sm:text-base font-medium text-gray-300 mb-2'>
+              Email
+            </label>
             <input
               name='email'
               value={data.email}
               onChange={onChangeHandle}
-              className='text-lg text-white p-3 rounded-lg border-2 border-[#0f5661] w-full bg-transparent outline-none'
+              className='w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500'
               type="email"
-              placeholder='Enter e-mail'
+              placeholder='Enter your email'
+              required
             />
           </div>
-          <div className='mb-5 flex flex-col'>
-            <label className='text-white text-lg mb-3'>Password: </label>
+          
+          <div>
+            <label className='block text-sm sm:text-base font-medium text-gray-300 mb-2'>
+              Password
+            </label>
             <input
               name='password'
               value={data.password}
               onChange={onChangeHandle}
-              className='text-lg text-white p-3 rounded-lg border-2 border-[#0f5661] w-full bg-transparent outline-none'
+              className='w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500'
               type="password"
               placeholder='Enter password'
+              required
             />
           </div>
-          {!error ? null : <p className='text-md my-3 text-red-600'>{error}</p>}
-          <p className='text-[#126976]'>Don't have an account? <Link className='text-[#23a8bd] ml-1 hover:text-[#0f5661]' to="/signup">Sign up</Link></p>
-          <button type='submit' className='mt-3 rounded w-full p-2 text-white bg-[#0f6c7a] hover:bg-[#12474f]'>Login</button>
+          
+          <button 
+            type='submit' 
+            className='w-full py-3 px-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-medium rounded-lg transition-all duration-300 shadow-md'
+          >
+            Log In
+          </button>
         </form>
+        
+        <p className='mt-6 text-center text-sm text-gray-400'>
+          Don't have an account?{' '}
+          <Link 
+            to="/signup" 
+            className='text-cyan-400 hover:text-cyan-300 font-medium'
+          >
+            Sign up
+          </Link>
+        </p>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Login    
+export default Login;

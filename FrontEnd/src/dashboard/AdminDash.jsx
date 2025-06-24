@@ -35,19 +35,18 @@ const AdminDash = () => {
 
     useEffect(() => {
         const storedToken = localStorage.getItem("token");
-
-        if (!storedToken) {
-            return navigate("/login");
-        }
-
+        if (!storedToken) return navigate("/login");
         dispatch(set_token(storedToken));
-        fetchUserData();
     }, []);
+
+    useEffect(() => {
+        if (token) fetchUserData();
+    }, [token]);
 
     if (!isAuthorized) return <div className="text-white text-center mt-10">Loading...</div>;
 
     return (
-        <div className="bg-[#031114] h-screen">
+      <div className="box-border min-h-screen w-full bg-gray-900">
             <Header name={admin + ' (Admin)'} />
             <Outlet />
         </div>

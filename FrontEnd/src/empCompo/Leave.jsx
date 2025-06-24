@@ -1,105 +1,123 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { update_att_info } from '../store/slices/UserSlice';
 
 const Leave = () => {
-
   const { att_info } = useSelector((state) => state.data);
-
   const { token } = useSelector((data) => data.auth);
+  const [leaves, setLeaves] = useState(att_info['leaves'] || []);
+  const [formData, setFormData] = useState({ date: '', reason: '' });
+  const dispatch = useDispatch();
 
+  useEffect(() => {
+    if (att_info.leaves) {
+      setLeaves(att_info.leaves);
+    }
+  }, [att_info]);
 
-  const [leaves , setLeaves] = useState(att_info['leaves'])
+  const pendingLeaves = leaves.filter(result => result.status === "pending");
 
-  const [data,setData] = useState({
-    date : '',
-    reason : ''
-  })
-
-  const dispatch = useDispatch()
-
-  const onChangeHandler = (e) =>{
-    const {name,value} = e.target;
-    setData({
-      ...data,
-      [name] : value
-    })
-  }
-
-  useEffect(()=>{
-     if(!att_info.leaves) return;
-     setLeaves(att_info.leaves)
-  },[att_info])
-   
-  
-  const pendingLeaves = leaves.filter((result) => {
-      return result.status == "pending"
-  }) || [];
-  
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    axios.post(`${import.meta.env.VITE_BACKEND_URL}/leave`, data ,{headers : {token}})
-      .then((response) => {
-        alert("Leave has been submitted")
-        dispatch(update_att_info({ data : response.data , category : 'leaves'}))
-        setData({
-          date : '',
-          reason : ''
-        })
-      })
-    .catch((error) => {
-      console.log(error)
-      if (error.response.status === 400 && error.response.data.message) {
-        alert(error.response.data.message);
-      }
-    })
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/leave`,
+        formData,
+        { headers: { token } }
+      );
+      alert("Leave request submitted successfully");
+      dispatch(update_att_info({ data: response.data, category: 'leaves' }));
+      setFormData({ date: '', reason: '' });
+    } catch (error) {
+      console.error("Leave error:", error);
+      alert(error.response?.data?.message || "Failed to submit leave request");
+    }
+  };
+
   return (
-    <div className="w-full my-10 border-4 px-5 py-3 border-[#0f5661] pr-5 flex justify-between">
-    <div className="max-w-md w-1/2 mx-auto bg-transparent border-4 border-[#0f5661] p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-bold mb-4 text-[#1a95a8]">Apply Leave</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-         <div>
-            <h1 className="block text-[#1a95a8] font-semibold ">Date</h1>
-            <input
-              value={data.date}
-              name="date"
-              onChange={onChangeHandler}
-              className="text-sm text-white w-full h-10 py-1 px-2 mt-2  rounded outline-none bg-transparent border-[1px] mb-4 border-gray-400"
-              type="date"
-            />
-          </div>
-        <div>
-          <label className="block text-[#1a95a8] font-semibold">Reason:</label>
-          <textarea value={data.reason} name="reason" onChange={onChangeHandler} placeholder='Enter Reason'  type="text" className="text-white w-full mt-2 p-2  border-2 border-[#0f5661] rounded bg-transparent"></textarea>
-        </div>
-        <button type="submit" className="w-full p-2 text-white rounded bg-blue-500 hover:bg-blue-600">
-          Mark Leave
-        </button>
-      </form>
-    </div>
-    <div className="w-1/2 ">
-      <h1 className="text-2xl text-[#1a95a8] font-bold mb-2">Pending Leaves</h1>
-      <div className="max-h-60 overflow-y-auto flex flex-wrap">
-      {!pendingLeaves.length > 0 ? <span className="text-white">NO DATA</span>:
-        pendingLeaves.map((att) => (
-          <div key={att._id} className="min-h-10 mb-2 px-2 border-2 my-3 flex items-center justify-between w-full">
-            <h1 className="text-white text-md">
-            {new Date(att.date).toISOString().split("T")[0]}
-            </h1>
+    <div className="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+
+        <div className="bg-gray-800 rounded-xl shadow-lg p-5 sm:p-6 border border-gray-700">
+          <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+            Apply for Leave
+          </h2>
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             <div>
-              <label className="text-[#1a95a8] font-semibold mr-2">Status:</label>
-              <span className="px-3 py-1 rounded text-white bg-yellow-500">
-                {att.status}
-              </span>
+              <label className="block text-sm sm:text-base font-medium text-gray-300 mb-1">Leave Date</label>
+              <input
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleChange}
+                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-300 text-sm sm:text-base"
+                required
+              />
             </div>
-          </div>
-        ))}
+            <div>
+              <label className="block text-sm sm:text-base font-medium text-gray-300 mb-1">Reason</label>
+              <textarea
+                name="reason"
+                value={formData.reason}
+                onChange={handleChange}
+                placeholder="Enter reason for leave"
+                rows="3"
+                className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-gray-300 text-sm sm:text-base"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full py-2 px-4 bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-blue-600 hover:to-cyan-500 text-white font-medium rounded-lg transition-all duration-300 text-sm sm:text-base"
+            >
+              Submit Leave Request
+            </button>
+          </form>
+        </div>
+
+        <div className="bg-gray-800 rounded-xl shadow-lg p-5 sm:p-6 border border-gray-700">
+          <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+            Pending Leave Requests
+          </h2>
+          {pendingLeaves.length > 0 ? (
+            <div className="space-y-3 sm:space-y-4 max-h-80 sm:max-h-96 overflow-y-auto pr-2">
+              {pendingLeaves.map((leave) => (
+                <div key={leave._id} className="bg-gray-700 p-4 rounded-lg border-l-4 border-yellow-500">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <p className="text-xs text-gray-400">Leave Date</p>
+                      <p className="font-medium text-white text-sm mb-2">
+                        {new Date(leave.date).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        })}
+                      </p>
+                      <p className="text-xs text-gray-400">Reason</p>
+                      <p className="text-white text-sm">{leave.reason}</p>
+                    </div>
+                    <span className="px-3 py-1 text-xs font-semibold rounded-full bg-yellow-500 text-white">
+                      Pending
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-400 text-sm">No pending leave requests</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
-  </div>
-  )
-}
+  );
+};
 
-export default Leave
+export default Leave;

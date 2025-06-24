@@ -4,58 +4,74 @@ import { useDispatch, useSelector } from 'react-redux';
 import { set_all_emp_data } from '../store/slices/UserSlice';
 
 const Pending_Cards = ({ data, property }) => {
-
   const { all_emp_data } = useSelector((result) => result.data);
-  
   const dispatch = useDispatch();
 
-  const handleAttendance = async (btn) => {
+  const handleAction = async (btn) => {
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/markAttendance`,
         { _id: data._id, btn, property }
       );
-      const updatedusers = all_emp_data.map((elem) => {
-        if (elem._id == response.data.updatedUser._id) {
-          return { ...elem, attendance: response.data.updatedUser.attendance, leaves: response.data.updatedUser.leaves };
-        } else {
-          return elem;
-        }
-      });
-      alert(`${property} has been marked`);
-      dispatch(set_all_emp_data(updatedusers));
+      const updatedUsers = all_emp_data.map((emp) => 
+        emp._id === response.data.updatedUser._id 
+          ? { ...emp, 
+              attendance: response.data.updatedUser.attendance, 
+              leaves: response.data.updatedUser.leaves 
+            } 
+          : emp
+      );
+      alert(`${property} has been ${btn}`);
+      dispatch(set_all_emp_data(updatedUsers));
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 
   return (
-    <div className=" mb-2 px-2 border-4 border-[#0f5661] my-3 flex flex-col w-full p-4  rounded">
-      <div className="flex justify-between items-center">
-        <div>
-          <label className="text-[#1a95a8] font-semibold mr-2">Date:</label>
-          <h1 className="inline text-white text-md">
-            {new Date(data.date).toDateString()}
-          </h1>
+    <div className="bg-gray-800 rounded-lg shadow-md p-4 mb-3 border-l-4 border-yellow-500">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div className="space-y-1">
+          <div className="flex items-center">
+            <span className="text-xs sm:text-sm text-gray-400 mr-2">Employee:</span>
+            <span className="text-sm sm:text-base font-medium text-white">
+              {data.user.fullname}
+            </span>
+          </div>
+          <div className="flex items-center">
+            <span className="text-xs sm:text-sm text-gray-400 mr-2">Date:</span>
+            <span className="text-sm sm:text-base text-white">
+              {new Date(data.date).toLocaleDateString('en-US', {
+                weekday: 'short', month: 'short', day: 'numeric'
+              })}
+            </span>
+          </div>
         </div>
-        <div>
-          <label className="text-[#1a95a8] font-semibold mr-2">Name:</label>
-          <h1 className="inline text-white font-bold">{data.user.fullname}</h1>
+
+        {property === 'leaves' && (
+          <div className="mt-2 sm:mt-0">
+            <span className="text-xs sm:text-sm text-gray-400">Reason:</span>
+            <p className="text-sm sm:text-base text-white bg-gray-700 p-2 rounded mt-1">
+              {data.reason}
+            </p>
+          </div>
+        )}
+
+        <div className="flex gap-2 mt-3 sm:mt-0 justify-end">
+          <button 
+            onClick={() => handleAction("accepted")}
+            className="px-3 py-1 sm:px-4 sm:py-2 bg-green-600 hover:bg-green-700 text-white text-xs sm:text-sm font-medium rounded transition-colors"
+          >
+            Accept
+          </button>
+          <button 
+            onClick={() => handleAction("rejected")}
+            className="px-3 py-1 sm:px-4 sm:py-2 bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm font-medium rounded transition-colors"
+          >
+            Reject
+          </button>
         </div>
-        <div className="mt-3 flex justify-end">
-        <button onClick={() => handleAttendance("accepted")} className="px-3 py-1 mx-2 rounded text-white bg-green-500">Accept</button>
-        <button onClick={() => handleAttendance("rejected")} className="px-3 py-1 rounded text-white bg-red-500">Reject</button>
       </div>
-      </div>
-
-      {property === 'leaves' && (
-        <div className="w-full mt-2">
-          <label className="text-[#1a95a8] font-semibold">Reason:</label>
-          <h1 className="text-white bg-gray-700 p-2 rounded">{data.reason}</h1>
-        </div>
-      )}
-
-
     </div>
   );
 };
