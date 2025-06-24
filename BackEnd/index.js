@@ -28,8 +28,6 @@ app.use(cors({
   origin: allowedOrigins,
 }));
 
-// Handle preflight requests
-app.options('*', cors());
 
 
 //  Auth Middleware
