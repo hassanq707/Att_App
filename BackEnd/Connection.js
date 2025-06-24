@@ -1,7 +1,17 @@
-const mongoose = require("mongoose");
+console.log("Loading Connection.js...");
+
+let mongoose;
+try {
+    mongoose = require("mongoose");
+    console.log("Mongoose loaded successfully");
+} catch (error) {
+    console.error("Failed to load mongoose:", error);
+    throw error;
+}
 
 const connectDB = async (URL) => {
     try {
+        console.log("Attempting to connect to DB...");
         await mongoose.connect(URL, {
             serverSelectionTimeoutMS: 30000, 
             socketTimeoutMS: 45000, 
