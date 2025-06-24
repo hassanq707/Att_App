@@ -23,26 +23,28 @@ const Signup = () => {
     });
   };
 
-  const submitHandle = (e) => {
+  const submitHandle = async (e) => {
     e.preventDefault();
-    axios.post(`${import.meta.env.VITE_BACKEND_URL}/user/signup`, data)
-      .then((result) => {
-        const { user, userData, token } = result.data;
-        dispatch(set_emp_data({ user, userData }));
-        localStorage.setItem("token", token);
-        dispatch(set_token(token));
-        navigate("/");
-      })
-      .catch((err) => console.log(err));
+    try {
+      const result = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/user/signup`, data);
+      const { user, userData, token } = result.data;
 
-    setTimeout(() => {
+      dispatch(set_emp_data({ user, userData }));
+      dispatch(set_token(token));
+      localStorage.setItem("token", token);
+      navigate("/");
+
       setData({
         fullname: '',
         email: '',
         password: '',
       });
-    }, 1000);
+    } catch (err) {
+      console.log(err);
+    }
   };
+
+
 
   return (
     <div className='min-h-screen w-full bg-gray-900 flex items-center justify-center p-4'>
@@ -50,7 +52,7 @@ const Signup = () => {
         <h1 className='text-2xl sm:text-3xl font-bold text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500'>
           Create Account
         </h1>
-        
+
         <form onSubmit={submitHandle} className='space-y-5'>
           <div>
             <label className='block text-sm sm:text-base font-medium text-gray-300 mb-2'>
@@ -66,7 +68,7 @@ const Signup = () => {
               required
             />
           </div>
-          
+
           <div>
             <label className='block text-sm sm:text-base font-medium text-gray-300 mb-2'>
               Email
@@ -81,7 +83,7 @@ const Signup = () => {
               required
             />
           </div>
-          
+
           <div>
             <label className='block text-sm sm:text-base font-medium text-gray-300 mb-2'>
               Password
@@ -96,19 +98,19 @@ const Signup = () => {
               required
             />
           </div>
-          
-          <button 
-            type='submit' 
+
+          <button
+            type='submit'
             className='w-full py-3 px-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-medium rounded-lg transition-all duration-300 shadow-md'
           >
             Sign Up
           </button>
         </form>
-        
+
         <p className='mt-6 text-center text-sm text-gray-400'>
           Already have an account?{' '}
-          <a 
-            href="/login" 
+          <a
+            href="/login"
             className='text-cyan-400 hover:text-cyan-300 font-medium'
           >
             Log in

@@ -23,27 +23,32 @@ const Login = () => {
     });
   };
 
-  const submitHandle = (e) => {
+  const submitHandle = async (e) => {
     e.preventDefault();
-    axios.post(`${import.meta.env.VITE_BACKEND_URL}/user/login`, data)
-      .then(response => {
-        const { user, userData, token } = response.data;
-        dispatch(set_emp_data(user));
-        dispatch(set_att_info(userData));
-        dispatch(set_token(token));
-        localStorage.setItem("token", token);
-        if (user.role === "admin") navigate("/admin");
-        else navigate("/");
-      })
-      .catch(error => {
-        console.log(error);
-        if (error.response) {
-          setError(error.response.data.message || "Invalid credentials");
-        } else {
-          setError("Network error. Please try again.");
-        }
-      });
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/user/login`, data);
+      const { user, userData, token } = response.data;
+
+      dispatch(set_emp_data(user));
+      dispatch(set_att_info(userData));
+      dispatch(set_token(token));
+      localStorage.setItem("token", token);
+
+      setData({ email: '', password: '' });
+
+      if (user.role === "admin") navigate("/admin");
+      else navigate("/");
+    } catch (error) {
+      console.log(error);
+      if (error.response) {
+        setError(error.response.data.message || "Invalid credentials");
+      } else {
+        setError("Network error. Please try again.");
+      }
+    }
   };
+
+
 
   return (
     <div className='min-h-screen w-full bg-gray-900 flex items-center justify-center p-4'>
@@ -51,13 +56,13 @@ const Login = () => {
         <h1 className='text-2xl sm:text-3xl font-bold text-center mb-6 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500'>
           Welcome Back
         </h1>
-        
+
         {error && (
           <div className='mb-4 p-3 bg-red-900/30 border border-red-700 rounded-lg text-red-300 text-sm'>
             {error}
           </div>
         )}
-        
+
         <form onSubmit={submitHandle} className='space-y-5'>
           <div>
             <label className='block text-sm sm:text-base font-medium text-gray-300 mb-2'>
@@ -73,7 +78,7 @@ const Login = () => {
               required
             />
           </div>
-          
+
           <div>
             <label className='block text-sm sm:text-base font-medium text-gray-300 mb-2'>
               Password
@@ -88,19 +93,19 @@ const Login = () => {
               required
             />
           </div>
-          
-          <button 
-            type='submit' 
+
+          <button
+            type='submit'
             className='w-full py-3 px-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-medium rounded-lg transition-all duration-300 shadow-md'
           >
             Log In
           </button>
         </form>
-        
+
         <p className='mt-6 text-center text-sm text-gray-400'>
           Don't have an account?{' '}
-          <Link 
-            to="/signup" 
+          <Link
+            to="/signup"
             className='text-cyan-400 hover:text-cyan-300 font-medium'
           >
             Sign up
