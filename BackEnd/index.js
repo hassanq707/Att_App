@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const express = require("express");
-const connectToMongo = require("./Connection");
+const { connectDB } = require("./Connection");
 const cors = require("cors");
 
 const app = express();
@@ -25,20 +25,12 @@ const allowedOrigins = [
 ];
 
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.log("❌ CORS blocked origin:", origin);
-      callback(null, false);
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'token'],
-  credentials: true
+  origin: allowedOrigins,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'token']
 }));
 
-// Preflight fix
+// Handle preflight requests
 app.options('*', cors());
 
 
@@ -73,11 +65,11 @@ app.post('/logout', (req, res) => {
 app.use("/", dataRoute);
 app.use("/user", userRoute);
 
-// Connect DB & Start Server
-connectToMongo(process.env.DB_URL)
-  .then(() => console.log("MongoDB Connected"))
-  .catch((err) => console.error("MongoDB Connection Error:", err));
 
-app.listen(PORT, () => {
-  console.log("Server is listening to PORT: " + PORT);
+connectDB(process.env.DB_URL).then(() => {
+  app.listen(PORT, () => {
+    console.log("Server is listening on PORT: " + PORT);
+  });
+}).catch((err) => {
+  console.error("Failed to connect to DB:", err);
 });
