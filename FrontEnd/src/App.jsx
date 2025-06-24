@@ -11,7 +11,7 @@ import WorkStatus from "./empCompo/WorkStatus";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route>
+    <>
       <Route path="/" element={<EmpDash />}>
         <Route index element={<Attendance />} />
         <Route path="leave" element={<Leave />} />
@@ -23,9 +23,10 @@ const router = createBrowserRouter(
       </Route>
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-    </Route>
+    </>
   )
 );
+
 
 function App() {
   return <RouterProvider router={router} />;
