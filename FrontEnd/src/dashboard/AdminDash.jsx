@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import axios from "axios"
 import Header from '../others/Header'
-import { Outlet, useNavigate } from 'react-router'
+import { Outlet, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { set_all_emp_data } from '../store/slices/UserSlice'
 import { set_token } from '../store/slices/TokenSlice'

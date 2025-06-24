@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router-dom';
 import { set_att_info, set_emp_data } from '../store/slices/UserSlice';
 import { useDispatch } from 'react-redux';
 import { set_token } from '../store/slices/TokenSlice';

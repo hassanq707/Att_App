@@ -2,7 +2,6 @@ import React from "react";
 import { createBrowserRouter, RouterProvider, createRoutesFromElements, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import axios from "axios"
 import EmpDash from "./dashboard/EmpDash";
 import AdminDash from "./dashboard/AdminDash";
 import Leave from "./empCompo/Leave"

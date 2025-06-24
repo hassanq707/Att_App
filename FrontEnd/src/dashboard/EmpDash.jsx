@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Header from '../others/Header';
 import { useDispatch, useSelector } from 'react-redux';
-import { Outlet, useNavigate } from 'react-router';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { set_att_info, set_emp_data } from '../store/slices/UserSlice'
 import axios from 'axios';
 import { set_token } from '../store/slices/TokenSlice';

@@ -6,7 +6,7 @@ async function handleAttendance(req, res) {
     const { today, _id } = req.body;
 
     const date = new Date(today);
-W
+    
     const attendanceData = await USER_DATA.findOne({ user: _id });
 
     const existingAttendance = attendanceData.attendance.find(
