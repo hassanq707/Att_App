@@ -17,6 +17,7 @@ const Header = ({ name }) => {
       await axios.post(`${import.meta.env.VITE_BACKEND_URL}/logout`);
       dispatch(clear_token());
       dispatch(clear_emp_data());
+      localStorage.removeItem("token")
       navigate('/login');
     } catch (err) {
       console.error("Logout error:", err);
