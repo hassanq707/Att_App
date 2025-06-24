@@ -1,4 +1,5 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import EmpDash from "./dashboard/EmpDash";
@@ -9,51 +10,24 @@ import Req_Attendance from "./adminCompo/Req_Attendance";
 import Emp_Status from "./adminCompo/Emp_Status";
 import WorkStatus from "./empCompo/WorkStatus";
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <EmpDash />,
-    children: [
-      {
-        index: true,
-        element: <Attendance />
-      },
-      {
-        path: "leave",
-        element: <Leave />
-      },
-      {
-        path: "status",
-        element: <WorkStatus />
-      }
-    ]
-  },
-  {
-    path: "/admin",
-    element: <AdminDash />,
-    children: [
-      {
-        index: true,
-        element: <Req_Attendance />
-      },
-      {
-        path: "Emp_Status",
-        element: <Emp_Status />
-      }
-    ]
-  },
-  {
-    path: "/login",
-    element: <Login />
-  },
-  {
-    path: "/signup",
-    element: <Signup />
-  }
-]);
-
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<EmpDash />}>
+          <Route index element={<Attendance />} />
+          <Route path="leave" element={<Leave />} />
+          <Route path="status" element={<WorkStatus />} />
+        </Route>
+        <Route path="/admin" element={<AdminDash />}>
+          <Route index element={<Req_Attendance />} />
+          <Route path="Emp_Status" element={<Emp_Status />} />
+        </Route>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;
