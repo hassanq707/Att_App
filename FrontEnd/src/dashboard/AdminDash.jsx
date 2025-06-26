@@ -26,7 +26,6 @@ const AdminDash = () => {
         catch (err) {
             console.log(err)
             if (err.response && err.response.status === 401) {
-                alert("You are Unauthorized to access this page");
                 navigate("/")
             }
             setIsAuthorized(false);
