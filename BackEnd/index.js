@@ -1,7 +1,5 @@
 require('dotenv').config();
-
 const express = require("express");
-const { connectDB } = require("./Connection");
 const cors = require("cors");
 
 const app = express();
@@ -9,6 +7,7 @@ const app = express();
 const userRoute = require('./routes/user');
 const dataRoute = require('./routes/data');
 const { restrictToLogin, checkForAuth } = require('./middleware');
+const { connectDB } = require('./config/DB')
 const USER = require("./models/users");
 const USER_DATA = require('./models/data');
 
@@ -20,7 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // CORS Configuration
 const allowedOrigins = [
-  'https://attpro.vercel.app',
+  process.env.FRONTEND_URL,
   'http://localhost:5173'
 ];
 
@@ -30,8 +29,12 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'token']
 }));
 
+// Handle preflight requests
 app.options('*', cors());
 
+// Db Connection
+
+connectDB()
 
 //  Auth Middleware
 app.use(checkForAuth);
@@ -65,10 +68,6 @@ app.use("/", dataRoute);
 app.use("/user", userRoute);
 
 // DB Connection
-connectDB(process.env.DB_URL).then(() => {
-  app.listen(PORT, () => {
-    console.log("Server is listening on PORT: " + PORT);
-  });
-}).catch((err) => {
-  console.error("Failed to connect to DB:", err);
+app.listen(PORT, () => {
+  console.log("Server is listening on PORT: " + PORT);
 });
