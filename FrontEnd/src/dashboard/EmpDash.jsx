@@ -21,7 +21,7 @@ const EmpDash = () => {
 
   async function fetchUserData() {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/`, {
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/employee`, {
         headers: { token }
       })
       const { user, data } = response.data;

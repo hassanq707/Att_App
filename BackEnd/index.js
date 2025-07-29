@@ -48,7 +48,7 @@ app.get("/allUsers", restrictToLogin(["admin"]), async (req, res) => {
   });
 });
 
-app.get("/", restrictToLogin(["employee"]), async (req, res) => {
+app.get("/employee", restrictToLogin(["employee"]), async (req, res) => {
   const user = await USER.findOne({ fullname: req.user.fullname });
   const data = await USER_DATA.findOne({ user: req.user._id });
 
@@ -62,6 +62,11 @@ app.get("/", restrictToLogin(["employee"]), async (req, res) => {
 app.post('/logout', (req, res) => {
   return res.status(200).json({ message: 'Logged out successfully' });
 });
+
+app.get('/', (req, res) => {
+  return res.send("Api is Working");
+});
+
 
 // Other Routes
 app.use("/", dataRoute);
