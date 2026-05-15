@@ -71,7 +71,6 @@ async function handleMarkAttendance(req, res) {
 }
 
 
-
 module.exports = {
     handleAttendance,
     handleLeave,

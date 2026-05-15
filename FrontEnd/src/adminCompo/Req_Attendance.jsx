@@ -7,6 +7,21 @@ const Req_Attendance = () => {
   const [btn, setBtn] = useState("attendance");
   const [data, setData] = useState([]);
 
+  // FlatMap ki property
+
+  // const users = [
+  //   { name: "Ali", tasks: ["a", "b"] },
+  //   { name: "Sara", tasks: ["c", "d"] }
+  // ];
+
+  // const allTasks = users.flatMap(user => user.tasks);
+
+  // console.log(allTasks);
+  
+  // Output:
+  // ["a", "b", "c", "d"]
+
+
   useEffect(() => {
     if (all_emp_data?.length > 0) {
       const filteredData = all_emp_data.flatMap(emp =>
@@ -28,18 +43,16 @@ const Req_Attendance = () => {
       </h2>
 
       <div className="flex gap-2 sm:gap-3 mb-4">
-        <button 
-          className={`px-3 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${
-            btn === "attendance" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-          }`}
+        <button
+          className={`px-3 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${btn === "attendance" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+            }`}
           onClick={() => setBtn("attendance")}
         >
           Attendance
         </button>
-        <button 
-          className={`px-3 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${
-            btn === "leaves" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-          }`}
+        <button
+          className={`px-3 py-2 rounded-lg font-medium transition-colors text-sm sm:text-base ${btn === "leaves" ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+            }`}
           onClick={() => setBtn("leaves")}
         >
           Leaves

@@ -20,6 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 // CORS Configuration
 const allowedOrigins = [
   process.env.FRONTEND_URL,
+  'https://attpro.vercel.app/',
   'http://localhost:5173'
 ];
 

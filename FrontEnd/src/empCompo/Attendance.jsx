@@ -16,8 +16,10 @@ const Attendance = () => {
     }
   }, [att_info]);
 
+
   const today = new Date().toISOString().split("T")[0];
   const pendingAttendances = attendance.filter(result => result.status === "pending");
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
